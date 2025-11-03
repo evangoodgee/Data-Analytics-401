@@ -1,0 +1,34 @@
+---
+title: "Early Results"
+author: "Evan Goodgee"
+date: "2025-10-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readr)
+library(dplyr)
+library(readxl)
+```
+
+```{r}
+setwd("C:/Users/evang/Classes/401/Final/Data/College_Scorecard_Raw_Data_05192025/College_Scorecard_Raw_Data_05192025")
+SC2014 <- read_csv("MERGED2014_15_PP.csv")
+```
+
+```{r}
+setwd("C:/Users/evang/Classes/401/Final/Data/IPEDS_2014-15_Final")
+IPEDS = read_excel("ADM2014.xlsx")
+```
+
+
+```{r}
+SC = SC2014 %>% select(UNITID, INSTNM ,COSTT4_A, AVGFACSAL, PFTFAC, C150_4, RET_FT4, MEDIAN_HH_INC, PRGMOFR, CIPCODE1, MD_EARN_WNE_P6, MD_EARN_WNE_P8, MD_EARN_WNE_P10)
+
+EducationData = merge(IPEDS, SC, by = "UNITID") %>% select(UNITID, INSTNM, everything())
+```
+
