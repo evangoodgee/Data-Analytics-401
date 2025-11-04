@@ -20,13 +20,22 @@ library(readxl)
 # Importing college scorecard data
 SC2014 <- read_csv("Data/College_Scorecard_Raw_Data_05192025/MERGED2014_15_PP.csv")
 
+SC = SC2014 %>% select(UNITID, INSTNM, ICLEVEL, COSTT4_A, AVGFACSAL, PFTFAC, C150_4, RET_FT4, PRGMOFR, CIPCODE1, MD_EARN_WNE_P6, MD_EARN_WNE_P8, MD_EARN_WNE_P10)
+
 # Importing IPEDS data
 IPEDS = read_excel("Data/IPEDS_2014-15_Final/ADM2014.xlsx")
+
+# Importing IPEDS Carnegie Classification data
+Car = read_excel("Data/IPEDS_2014-15_Final/HD2014.xlsx")
+Classification = Car %>% select(UNITID, CCBASIC)
+
 ```
 
 ```{r}
-SC = SC2014 %>% select(UNITID, INSTNM ,COSTT4_A, AVGFACSAL, PFTFAC, C150_4, RET_FT4, MEDIAN_HH_INC, PRGMOFR, CIPCODE1, MD_EARN_WNE_P6, MD_EARN_WNE_P8, MD_EARN_WNE_P10)
+# Merging Datasets
+Merged = merge(IPEDS, SC, by = "UNITID")
 
-EducationData = merge(IPEDS, SC, by = "UNITID") %>% select(UNITID, INSTNM, everything())
+# Selecting required variables and filtering out non-four year institutions
+EducationData = merge(Merged, Classification, by  = "UNITID") %>% select(UNITID, INSTNM, ICLEVEL, CCBASIC, everything())  %>% filter(ICLEVEL == 1)
 ```
 
