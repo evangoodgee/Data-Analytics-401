@@ -14,6 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(readr)
 library(dplyr)
 library(readxl)
+library(ggplot2)
 ```
 
 ```{r}
@@ -74,13 +75,31 @@ EducationData$BCAS = ifelse(EducationData$CCBASIC == 21, 1, 0)
 
 # Baccalaureate College - Diverse Fields
 EducationData$BCG = ifelse(EducationData$CCBASIC == 22, 1, 0)
+
+# Reconfiguring CCBASIC to create visualizations
+EducationData$CCBASIC[EducationData$CCBASIC == 15] = "RUVH"
+EducationData$CCBASIC[EducationData$CCBASIC == 16] = "RUH"
+EducationData$CCBASIC[EducationData$CCBASIC == 17] = "RU"
+EducationData$CCBASIC[EducationData$CCBASIC == 18] = "LMP"
+EducationData$CCBASIC[EducationData$CCBASIC == 19] = "MMP"
+EducationData$CCBASIC[EducationData$CCBASIC == 20] = "SMP"
+EducationData$CCBASIC[EducationData$CCBASIC == 21] = "BCAS"
+EducationData$CCBASIC[EducationData$CCBASIC == 22] = "BCG"
 ```
 
 ```{r}
 # Linear Regression Model
 lm10YearNoControls = lm(log(Income10) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + AdmissionPct + ACTScore75 + PFTFAC, data = EducationData)
 summary(lm10YearNoControls)
-
-cor()
 ```
+
+
+
+```{r}
+hist(EducationData$PFTFAC)
+ggplot(data = EducationData, aes(x = CCBASIC, y = Income10)) +
+  geom_boxplot() +
+  theme_minimal()
+```
+
 
