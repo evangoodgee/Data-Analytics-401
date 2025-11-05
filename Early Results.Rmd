@@ -35,8 +35,16 @@ Classification = Car %>% select(UNITID, CCBASIC)
 # Merging Datasets
 Merged = merge(IPEDS, SC, by = "UNITID")
 
+# Converting and renaming income variables
+Merged$Income10 = as.double(Merged$MD_EARN_WNE_P10)
+Merged$Income8 = as.double(Merged$MD_EARN_WNE_P8)
+Merged$Income6 = as.double(Merged$MD_EARN_WNE_P6)
+
 # Selecting required variables and filtering out non-four-year and non-standard institutions
-EducationData = merge(Merged, Classification, by  = "UNITID") %>% select(UNITID, INSTNM, ICLEVEL, CCBASIC, everything(), -SecondaryTranscript, -SecondaryGPA, -TestScores, -CIPCODE1, -PRGMOFR)  %>% filter(ICLEVEL == 1) %>% filter(CCBASIC %in% c(15,16,17,18,19,20,21,22))
+EducationData = merge(Merged, Classification, by  = "UNITID") %>% select(UNITID, INSTNM, ICLEVEL, CCBASIC, everything(), -SecondaryTranscript, -SecondaryGPA, -TestScores, -CIPCODE1, -PRGMOFR, -MD_EARN_WNE_P6, -MD_EARN_WNE_P8, -MD_EARN_WNE_P10)  %>% filter(ICLEVEL == 1) %>% filter(CCBASIC %in% c(15,16,17,18,19,20,21,22))
+
+
+
 ```
 
 
@@ -66,11 +74,13 @@ EducationData$BCAS = ifelse(EducationData$CCBASIC == 21, 1, 0)
 
 # Baccalaureate College - Diverse Fields
 EducationData$BCG = ifelse(EducationData$CCBASIC == 22, 1, 0)
-str(EducationData)
 ```
 
 ```{r}
 # Linear Regression Model
-lm10YearNoControls = lm(MD_EARN_WNE_P10 ~ RUVH + RUH + RU + LMP + MMP + SMP + BCAS + BCG, data = EducationData)
+lm10YearNoControls = lm(log(Income10) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + AdmissionPct + ACTScore75 + PFTFAC, data = EducationData)
+summary(lm10YearNoControls)
+
+cor()
 ```
 
