@@ -35,7 +35,42 @@ Classification = Car %>% select(UNITID, CCBASIC)
 # Merging Datasets
 Merged = merge(IPEDS, SC, by = "UNITID")
 
-# Selecting required variables and filtering out non-four year institutions
-EducationData = merge(Merged, Classification, by  = "UNITID") %>% select(UNITID, INSTNM, ICLEVEL, CCBASIC, everything())  %>% filter(ICLEVEL == 1)
+# Selecting required variables and filtering out non-four-year and non-standard institutions
+EducationData = merge(Merged, Classification, by  = "UNITID") %>% select(UNITID, INSTNM, ICLEVEL, CCBASIC, everything(), -SecondaryTranscript, -SecondaryGPA, -TestScores, -CIPCODE1, -PRGMOFR)  %>% filter(ICLEVEL == 1) %>% filter(CCBASIC %in% c(15,16,17,18,19,20,21,22))
+```
+
+
+```{r}
+# Creating dummy variables for Carnegie Classification
+
+# Research University - Very High Research Activity
+EducationData$RUVH = ifelse(EducationData$CCBASIC == 15, 1, 0)
+
+# Research University - High Research Activity
+EducationData$RUH = ifelse(EducationData$CCBASIC == 16, 1, 0)
+
+# Research University 
+EducationData$RU = ifelse(EducationData$CCBASIC == 17, 1, 0)
+
+# Large Master's Programs
+EducationData$LMP = ifelse(EducationData$CCBASIC == 18, 1, 0)
+
+# Medium Master's Programs
+EducationData$MMP = ifelse(EducationData$CCBASIC == 19, 1, 0)
+
+# Small Master's Programs
+EducationData$SMP = ifelse(EducationData$CCBASIC == 20, 1, 0)
+
+# Baccalaureate College - Arts and Sciences (Liberal Arts)
+EducationData$BCAS = ifelse(EducationData$CCBASIC == 21, 1, 0)
+
+# Baccalaureate College - Diverse Fields
+EducationData$BCG = ifelse(EducationData$CCBASIC == 22, 1, 0)
+str(EducationData)
+```
+
+```{r}
+# Linear Regression Model
+lm10YearNoControls = lm(MD_EARN_WNE_P10 ~ RUVH + RUH + RU + LMP + MMP + SMP + BCAS + BCG, data = EducationData)
 ```
 
