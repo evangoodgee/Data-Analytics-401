@@ -15,6 +15,7 @@ library(readr)
 library(dplyr)
 library(readxl)
 library(ggplot2)
+library(gtsummary)
 ```
 
 ```{r}
@@ -76,6 +77,13 @@ EducationData$BCAS = ifelse(EducationData$CCBASIC == 21, 1, 0)
 # Baccalaureate College - Diverse Fields
 EducationData$BCG = ifelse(EducationData$CCBASIC == 22, 1, 0)
 
+#
+EducationData$CCGroup = ifelse(EducationData$CCBASIC %in% c(15,16,17), "Doctoral",
+                               ifelse(EducationData$CCBASIC %in% c(18,19,20), "Master's",
+                                      "Baccelaurate"))
+  
+
+
 # Reconfiguring CCBASIC to create visualizations
 EducationData$CCBASIC[EducationData$CCBASIC == 15] = "RUVH"
 EducationData$CCBASIC[EducationData$CCBASIC == 16] = "RUH"
@@ -89,17 +97,33 @@ EducationData$CCBASIC[EducationData$CCBASIC == 22] = "BCG"
 
 ```{r}
 # Linear Regression Model
-lm10YearNoControls = lm(log(Income10) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + AdmissionPct + ACTScore75 + PFTFAC, data = EducationData)
-summary(lm10YearNoControls)
+lm10Year = lm(log(Income10) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + AdmissionPct + ACTScore75 + PFTFAC, data = EducationData)
+rsq = summary(lm10Year)$r.squared
+adj_rsq = summary(lm10Year)$adj.r.squared
+
+tbl = tbl_regression(lm10Year) %>%
+  modify_footnote(
+    update = everything() ~paste0("R-squared = ", round(rsq, 3),
+                                  ", Adj. R-squared = ", round(adj_rsq, 3))
+  )
+
+tbl %>% as_gt() %>% gt::gtsave("regression_table.html")
+tbl
+browseURL("regression_table.html")
 ```
 
 
 
 ```{r}
 hist(EducationData$PFTFAC)
-ggplot(data = EducationData, aes(x = CCBASIC, y = Income10)) +
+ggplot(data = EducationData, aes(x = CCBASIC, y = Income10, color = CCGroup, )) +
   geom_boxplot() +
-  theme_minimal()
+  facet_wrap(~CCGroup, scales = "free_x", strip.position = "bottom") +
+  ggtitle("Average Median 10 Year Income by Carnegie Classification") +
+  xlab("Carnegie Classification") +
+  ylab("Average Median 10 Year Income") +
+  theme_classic() + 
+  theme(legend.position = "none")
 ```
 
 
