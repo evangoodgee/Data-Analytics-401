@@ -20,9 +20,31 @@ library(gtsummary)
 
 ```{r}
 # Importing college scorecard data
-SC2014 <- read_csv("Data/College_Scorecard_Raw_Data_05192025/MERGED2014_15_PP.csv")
+SC2014 = read_csv("Data/College_Scorecard_Raw_Data_05192025/MERGED2014_15_PP.csv")
 
-SC = SC2014 %>% select(UNITID, INSTNM, ICLEVEL, COSTT4_A, AVGFACSAL, PFTFAC, C150_4, RET_FT4, PRGMOFR, CIPCODE1, MD_EARN_WNE_P6, MD_EARN_WNE_P8, MD_EARN_WNE_P10)
+SC = SC2014 %>% 
+  select(UNITID, 
+         INSTNM, 
+         ICLEVEL, 
+         AVGFACSAL, 
+         PFTFAC, 
+         C150_4, 
+         PRGMOFR, 
+         MD_EARN_WNE_P6, 
+         MD_EARN_WNE_P8, 
+         MD_EARN_WNE_P10)
+
+MJRdata = read_csv("Data/College_Scorecard_Raw_Data_05192025/FieldOfStudyData1415_1516_PP.csv")
+
+MJR = MJRdata %>% 
+  filter(CREDLEV == 3) %>%
+  select(UNITID,
+        CONTROL, 
+        CIPCODE, 
+        CIPDESC, 
+        CREDLEV, 
+  ) 
+
 
 # Importing IPEDS data
 IPEDS = read_excel("Data/IPEDS_2014-15_Final/ADM2014.xlsx")
@@ -80,7 +102,7 @@ EducationData$BCG = ifelse(EducationData$CCBASIC == 22, 1, 0)
 #
 EducationData$CCGroup = ifelse(EducationData$CCBASIC %in% c(15,16,17), "Doctoral",
                                ifelse(EducationData$CCBASIC %in% c(18,19,20), "Master's",
-                                      "Baccelaurate"))
+                                      "Baccelaureate"))
   
 
 
