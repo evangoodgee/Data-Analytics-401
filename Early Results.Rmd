@@ -34,24 +34,36 @@ SC = SC2014 %>%
          MD_EARN_WNE_P8, 
          MD_EARN_WNE_P10)
 
-MJRdata = read_csv("Data/College_Scorecard_Raw_Data_05192025/FieldOfStudyData1415_1516_PP.csv")
+MJRdata = read_csv("Data/College_Scorecard_Raw_Data_05192025/FieldOfStudyData1819_1920_PP.csv")
+
+# Creating dummy variables for public/private
+MJRdata$Public = ifelse(MJRdata$CONTROL == "Public", 1, 0)
+MJRdata$Private = ifelse(MJRdata$CONTROL == "Private, nonprofit", 1, 0)
 
 MJR = MJRdata %>% 
-  filter(CREDLEV == 3) %>%
+  filter(CREDLEV == 3) %>% 
+  filter(CONTROL %in% (c("Public", "Private, nonprofit"))) %>%
   select(UNITID,
-        CONTROL, 
+        Public,
+        Private,
         CIPCODE, 
         CIPDESC, 
-        CREDLEV, 
-  ) 
+        CREDLEV
+  )
+
 
 
 # Importing IPEDS data
 IPEDS = read_excel("Data/IPEDS_2014-15_Final/ADM2014.xlsx")
+IPEDS = IPEDS %>% select(UNITID,
+                         AdmissionPct,
+                         ACTScore75,
+                         
+                         )
 
 # Importing IPEDS Carnegie Classification data
-Car = read_excel("Data/IPEDS_2014-15_Final/HD2014.xlsx")
-Classification = Car %>% select(UNITID, CCBASIC)
+Class = read_excel("Data/IPEDS_2014-15_Final/HD2014.xlsx")
+Classification = Class %>% select(UNITID, CCBASIC)
 
 ```
 
@@ -65,7 +77,10 @@ Merged$Income8 = as.double(Merged$MD_EARN_WNE_P8)
 Merged$Income6 = as.double(Merged$MD_EARN_WNE_P6)
 
 # Selecting required variables and filtering out non-four-year and non-standard institutions
-EducationData = merge(Merged, Classification, by  = "UNITID") %>% select(UNITID, INSTNM, ICLEVEL, CCBASIC, everything(), -SecondaryTranscript, -SecondaryGPA, -TestScores, -CIPCODE1, -PRGMOFR, -MD_EARN_WNE_P6, -MD_EARN_WNE_P8, -MD_EARN_WNE_P10)  %>% filter(ICLEVEL == 1) %>% filter(CCBASIC %in% c(15,16,17,18,19,20,21,22))
+EducationData = merge(Merged, Classification, by  = "UNITID") %>% 
+  select(UNITID, INSTNM, ICLEVEL, CCBASIC, everything(), -SecondaryTranscript, -SecondaryGPA, -TestScores, -PRGMOFR, -MD_EARN_WNE_P6, -MD_EARN_WNE_P8, -MD_EARN_WNE_P10)  %>% 
+  filter(ICLEVEL == 1) %>% 
+  filter(CCBASIC %in% c(15,16,17,18,19,20,21,22))
 
 
 
