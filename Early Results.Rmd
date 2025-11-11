@@ -20,7 +20,7 @@ library(gtsummary)
 
 ```{r}
 # Importing college scorecard data
-SC2014 = read_csv("Data/College_Scorecard_Raw_Data_05192025/MERGED2014_15_PP.csv")
+SC2014 = read_csv("Data/College_Scorecard_Raw_Data_05192025/MERGED2017_18_PP.csv")
 
 SC = SC2014 %>% 
   select(UNITID, 
@@ -34,7 +34,7 @@ SC = SC2014 %>%
          MD_EARN_WNE_P8, 
          MD_EARN_WNE_P10)
 
-MJRdata = read_csv("Data/College_Scorecard_Raw_Data_05192025/FieldOfStudyData1819_1920_PP.csv")
+MJRdata = read_csv("Data/College_Scorecard_Raw_Data_05192025/FieldOfStudyData1718_1819_PP.csv")
 
 # Creating dummy variables for public/private
 MJRdata$Public = ifelse(MJRdata$CONTROL == "Public", 1, 0)
@@ -48,7 +48,9 @@ MJR = MJRdata %>%
         Private,
         CIPCODE, 
         CIPDESC, 
-        CREDLEV
+        CREDLEV,
+        EARN_MDN_4YR
+        EARN_MDN_5YR
   )
 
 
