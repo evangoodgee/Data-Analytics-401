@@ -34,6 +34,8 @@ MJRdata = read_csv("Data/College_Scorecard_Raw_Data_05192025/FieldOfStudyData181
 # Creating dummy variables for public/private
 MJRdata$Public = ifelse(MJRdata$CONTROL == "Public", 1, 0)
 MJRdata$Private = ifelse(MJRdata$CONTROL == "Private, nonprofit", 1, 0)
+MJRdata$EARN_MDN_1YR[MJRdata$EARN_MDN_1YR == "PS"] = NA
+MJRdata$EARN_MDN_4YR[MJRdata$EARN_MDN_4YR == "PS"] = NA
 
 MJR = MJRdata %>% 
   filter(CREDLEV == 3) %>% 
@@ -60,7 +62,6 @@ IPEDS = IPEDS %>% select(UNITID,
 # Importing IPEDS Carnegie Classification data
 Class = read_excel("Data/IPEDS_2018-19/HD2018.xlsx")
 Classification = Class %>% select(UNITID, CCBASIC)
-
 ```
 
 ```{r}
