@@ -34,8 +34,12 @@ MJRdata = read_csv("Data/College_Scorecard_Raw_Data_05192025/FieldOfStudyData181
 # Creating dummy variables for public/private
 MJRdata$Public = ifelse(MJRdata$CONTROL == "Public", 1, 0)
 MJRdata$Private = ifelse(MJRdata$CONTROL == "Private, nonprofit", 1, 0)
+
+# Removing strings and making income columns numeric
 MJRdata$EARN_MDN_1YR[MJRdata$EARN_MDN_1YR == "PS"] = NA
 MJRdata$EARN_MDN_4YR[MJRdata$EARN_MDN_4YR == "PS"] = NA
+MJRdata$EARN_MDN_1YR = as.numeric(MJRdata$EARN_MDN_1YR)
+MJRdata$EARN_MDN_4YR = as.numeric(MJRdata$EARN_MDN_4YR)
 
 MJR = MJRdata %>% 
   filter(CREDLEV == 3) %>% 
@@ -130,10 +134,12 @@ math = EducationData %>% filter(CIPCODE == 2701)
 
 ```{r}
 # Linear Regression Model
-lm10Year = lm(log(EARN_MDN_4YR) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + AdmissionPct + ACTScore75 + AVGFACSAL, data = math)
+options(scipen = 999)
+lm4Year = lm(log(EARN_MDN_4YR) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + AdmissionPct + ACTCM75 + AVGFACSAL, data = math)
 rsq = summary(lm10Year)$r.squared
 adj_rsq = summary(lm10Year)$adj.r.squared
 
+summary(lm4Year)
 tbl = tbl_regression(lm10Year) %>%
   modify_footnote(
     update = everything() ~paste0("R-squared = ", round(rsq, 3),
