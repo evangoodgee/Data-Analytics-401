@@ -13,3 +13,7 @@ a Microsoft Access database format. Both links are included below.
 https://collegescorecard.ed.gov/data/
 https://nces.ed.gov/ipeds/use-the-data/download-access-database
 
+In this project, I attempt to identify how different institution types, divided
+by Carnegie Classification, impact student earnings levels. I use data from
+NCES' IPEDS to identify schools' key demographic information, and College
+Scorecard information to collect both institutional and degree major earnings.
