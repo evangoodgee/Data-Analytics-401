@@ -1,0 +1,101 @@
+---
+title: "First Draft"
+format: html
+editor: visual
+---
+
+## Downloading Libraries and Data
+
+```{r}
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(gtsummary)
+
+EducationData = read_csv("Data/MergedEducationData.csv")
+
+# Creating subsets of data for specific degree types
+math = EducationData %>% filter(CIPCODE %in% c(2701, 2703, 2706, 2799))
+bio = EducationData %>% filter(CIPCODE == 2601)
+hist = EducationData %>% filter(CIPCODE == 5401)
+eng = EducationData %>% filter(CIPCODE %in% c(2301, 2401, 2313, 2401, 0901, 4513, 4511, 4502))
+```
+
+## Creating regression models
+
+```{r}
+# Regression for math majors
+lm4YearMath = lm(log(EARN_MDN_4YR) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + AdmissionPct + ACTCM75 + log(AVGFACSAL), data = math)
+
+# Regression for biology majors
+lm4YearBio = lm(log(EARN_MDN_4YR) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + AdmissionPct + ACTCM75 + log(AVGFACSAL), data = bio)
+
+# Regression for english majors
+lm4YearEng = lm(log(EARN_MDN_4YR) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + Public + Private + AdmissionPct + ACTCM75 + log(AVGFACSAL) + log(PFTFAC), data = eng)
+
+summary(lm4YearBio)
+summary(lm4YearMath)
+summary(lm4YearEng)
+
+namath = na.omit(math)
+namath %>% count(CCBASIC)
+
+biomath = na.omit(bio)
+biomath %>% count(CCBASIC)
+
+nahist = na.omit(hist)
+nahist %>% count(CCBASIC)
+
+naeng = na.omit(eng)
+naeng %>% count(CCBASIC)
+```
+
+## Testing Model Validity
+
+```{r}
+hist(log(EducationData$PFTFAC))
+
+# Normality of residuals
+res = resid(lm4YearEng)
+qqnorm(res)
+
+# Multicolinearity
+regVar = eng %>% select(EARN_MDN_4YR,RUVH, RUH, RU, LMP, MMP, SMP, BCG, BCAS,  AdmissionPct, ACTCM75, AVGFACSAL)
+cor(regVar, use = "pairwise.complete.obs")
+
+# Homoscedasticity
+plot(fitted(lm4YearEng), res)
+```
+
+```{r}
+# Calculating coefficients - after logging the dependent variable, you have to
+# exponentiate the coefficient to see the relationship
+
+# Exponentiating RUVH
+exp(-0.123762298)
+
+# Exponentiating RUH
+exp(-0.048091975)
+
+# Exponentiating RU
+exp(-0.045375469)
+
+# Exponentiating LMP
+exp(-0.056203743)
+
+# Exponentiating MMP
+exp(0.025433683)
+
+# Exponentiating SMP
+exp(0.004253232)
+
+# Exponentiating BCG
+exp(0.146205353)
+
+
+naBio = na.omit(bio)
+naBio %>% count(CCBASIC)
+
+naMath = na.omit(math)
+naMath %>% count(CCBASIC)
+```
