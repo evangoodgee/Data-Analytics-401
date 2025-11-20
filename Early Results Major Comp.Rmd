@@ -137,7 +137,6 @@ bio = EducationData %>% filter(CIPCODE == 2601)
 
 ```{r}
 # Linear Regression Model
-options(scipen = 999)
 lm4Year = lm(log(EARN_MDN_4YR) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + AdmissionPct + ACTCM75 + AVGFACSAL, data = math)
 rsq = summary(lm4Year)$r.squared
 adj_rsq = summary(lm4Year)$adj.r.squared
