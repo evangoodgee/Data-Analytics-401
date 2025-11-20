@@ -31,7 +31,7 @@ lm4YearMath = lm(log(EARN_MDN_4YR) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + A
 lm4YearBio = lm(log(EARN_MDN_4YR) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + AdmissionPct + ACTCM75 + log(AVGFACSAL), data = bio)
 
 # Regression for english majors
-lm4YearEng = lm(log(EARN_MDN_4YR) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + Public + Private + AdmissionPct + ACTCM75 + log(AVGFACSAL) + log(PFTFAC), data = eng)
+lm4YearEng = lm(log(EARN_MDN_4YR) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + Public + AdmissionPct + ACTCM75 + UGDS + UGDS_WHITE + log(AVGFACSAL) + log(PFTFAC), data = eng)
 
 summary(lm4YearBio)
 summary(lm4YearMath)
