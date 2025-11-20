@@ -65,7 +65,7 @@ IPEDS = IPEDS %>% select(UNITID,
 
 # Importing IPEDS Carnegie Classification data
 Class = read_excel("Data/IPEDS_2018-19/HD2018.xlsx")
-Classification = Class %>% select(UNITID, CCBASIC)
+Classification = Class %>% select(UNITID, CCBASIC, CARNEGIE)
 ```
 
 ```{r}
@@ -129,6 +129,9 @@ EducationData$CCBASIC[EducationData$CCBASIC == 22] = "BCG"
 ```{r}
 # Creating a data set with just Mathematics Majors to isolate earnings differences
 math = EducationData %>% filter(CIPCODE == 2701)
+
+# Creating a data set with just Biology Majors to isolate earnings differences
+bio = EducationData %>% filter(CIPCODE == 2601)
 ```
 
 
@@ -165,6 +168,7 @@ cor(regVar, use = "pairwise.complete.obs")
 
 # Homoscedasticity
 plot(fitted(lm4Year), res)
+
+write_csv(EducationData, file = "MergedEducationData.csv")
+majorNumbers = EducationData %>% count(CIPDESC)
 ```
-
-
