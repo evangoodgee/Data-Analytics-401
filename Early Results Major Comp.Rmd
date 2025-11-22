@@ -27,7 +27,10 @@ SC = SC2014 %>%
          INSTNM,
          ICLEVEL,
          AVGFACSAL,
-         PFTFAC)
+         PFTFAC,
+         C150_4,
+         PELL_COMP_ORIG_YR6_RT,
+         LOCALE)
 
 MJRdata = read_csv("Data/College_Scorecard_Raw_Data_05192025/FieldOfStudyData1819_1920_PP.csv")
 
@@ -51,8 +54,7 @@ MJR = MJRdata %>%
         CIPDESC, 
         CREDLEV,
         EARN_MDN_1YR,
-        EARN_MDN_4YR
-  )
+        EARN_MDN_4YR)
 
 
 
@@ -60,6 +62,7 @@ MJR = MJRdata %>%
 IPEDS = read_excel("Data/IPEDS_2018-19/ADM2018.xlsx")
 IPEDS = IPEDS %>% select(UNITID,
                          AdmissionPct,
+                         YieldPct,
                          ACTCM75,
                          )
 
