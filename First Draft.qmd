@@ -13,12 +13,19 @@ library(ggplot2)
 library(gtsummary)
 
 EducationData = read_csv("Data/MergedEducationData.csv")
+EducationData$PELL_RT = as.numeric(EducationData$PELL_RT)
+
+majorNumbers = EducationData %>% count(CIPDESC)
+
+# Creating new dummy variables for regression
+EducationData$Doctoral = ifelse(EducationData$CCGroup == "Doctoral", 1, 0)
+EducationData$Masters = ifelse(EducationData$CCGroup == "Master's", 1, 0)
+EducationData$Baccelaureate = ifelse(EducationData$CCGroup == "Baccelaureate", 1, 0)
 
 # Creating subsets of data for specific degree types
 math = EducationData %>% filter(CIPCODE %in% c(2701, 2703, 2706, 2799))
 bio = EducationData %>% filter(CIPCODE == 2601)
-hist = EducationData %>% filter(CIPCODE == 5401)
-eng = EducationData %>% filter(CIPCODE %in% c(2301, 2401, 2313, 2401, 0901, 4513, 4511, 4502))
+humanities = EducationData %>% filter(CIPCODE %in% c(2301, 2401, 2313, 0901, 1609, 3801, 3802, 5401)) 
 ```
 
 ## Creating regression models
@@ -31,11 +38,11 @@ lm4YearMath = lm(log(EARN_MDN_4YR) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + A
 lm4YearBio = lm(log(EARN_MDN_4YR) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + AdmissionPct + ACTCM75 + log(AVGFACSAL), data = bio)
 
 # Regression for english majors
-lm4YearEng = lm(log(EARN_MDN_4YR) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + Public + AdmissionPct + ACTCM75 + UGDS + UGDS_WHITE + log(AVGFACSAL) + log(PFTFAC), data = eng)
+lm4YearHumanities = lm(log(EARN_MDN_4YR) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + Public + AdmissionPct + GradRate + PELL_RT + log(AVGFACSAL), data = humanities)
 
 summary(lm4YearBio)
 summary(lm4YearMath)
-summary(lm4YearEng)
+summary(lm4YearHumanities)
 
 namath = na.omit(math)
 namath %>% count(CCBASIC)
@@ -43,59 +50,45 @@ namath %>% count(CCBASIC)
 biomath = na.omit(bio)
 biomath %>% count(CCBASIC)
 
-nahist = na.omit(hist)
-nahist %>% count(CCBASIC)
-
-naeng = na.omit(eng)
-naeng %>% count(CCBASIC)
+naHumanities = na.omit(humanities)
+naHumanities %>% count(CCBASIC)
 ```
 
 ## Testing Model Validity
 
 ```{r}
-hist(log(EducationData$PFTFAC))
-
 # Normality of residuals
-res = resid(lm4YearEng)
+res = resid(lm4YearHumanities)
 qqnorm(res)
 
+hist(res)
+
 # Multicolinearity
-regVar = eng %>% select(EARN_MDN_4YR,RUVH, RUH, RU, LMP, MMP, SMP, BCG, BCAS,  AdmissionPct, ACTCM75, AVGFACSAL)
+regVar = humanities %>% select(EARN_MDN_4YR,RUVH, RUH, RU, LMP, MMP, SMP, BCG, BCAS,  AdmissionPct, ACTCM75, AVGFACSAL)
 cor(regVar, use = "pairwise.complete.obs")
 
 # Homoscedasticity
-plot(fitted(lm4YearEng), res)
+plot(fitted(lm4YearHumanities), res)
 ```
 
+## Creating a new regression with institution types grouped
+
 ```{r}
-# Calculating coefficients - after logging the dependent variable, you have to
-# exponentiate the coefficient to see the relationship
+lm4YearHumanitiesGrouped = lm(log(EARN_MDN_4YR) ~ Doctoral + Masters + Public + AdmissionPct + GradRate + PELL_RT + log(AVGFACSAL), data = humanities)
+summary(lm4YearEngGrouped)
+```
 
-# Exponentiating RUVH
-exp(-0.123762298)
+## Testing Model Validity
 
-# Exponentiating RUH
-exp(-0.048091975)
+```{r}
+# Normality of residuals
+res = resid(lm4YearHumanitiesGrouped)
+qqnorm(res)
 
-# Exponentiating RU
-exp(-0.045375469)
+# Multicolinearity
+regVar = humanities %>% select(EARN_MDN_4YR, Masters, Doctoral, Baccelaureate, AdmissionPct, ACTCM75, AVGFACSAL)
+cor(regVar, use = "pairwise.complete.obs")
 
-# Exponentiating LMP
-exp(-0.056203743)
-
-# Exponentiating MMP
-exp(0.025433683)
-
-# Exponentiating SMP
-exp(0.004253232)
-
-# Exponentiating BCG
-exp(0.146205353)
-
-
-naBio = na.omit(bio)
-naBio %>% count(CCBASIC)
-
-naMath = na.omit(math)
-naMath %>% count(CCBASIC)
+# Homoscedasticity
+plot(fitted(lm4YearHumanitiesGrouped), res)
 ```
