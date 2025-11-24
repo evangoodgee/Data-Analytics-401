@@ -24,6 +24,8 @@ library(readxl)
 library(ggplot2)
 
 library(gtsummary)
+
+library(car)
 ```
 
 ```{r}
@@ -203,14 +205,22 @@ ggplot(data = EducationData2, aes(x = CCBASIC, y = Income10)) +
 
 # Normality of Residuals
 res = resid(lm10Year)
-qqnorm(res) + 
-  qqline(res)
-
+qplot(sample = res) +
+  stat_qq() +
+  stat_qq_line() + 
+  theme_classic() +
+  labs(x = "Theoretical Quantiles", y ="Sample Quantiles", title = "Normal Q-Q Plot")
+  
 # Multicolinearity
 vif(lm10Year)
 
 # Homoscedasticity
-plot(fitted(lm10Year), res)
+ggplot(data.frame(res = res), aes(x = fitted(lm10Year), y = res)) +
+  geom_point() +
+  geom_smooth() +
+  labs(x = "Fitted Values", y = "Residuals", title = "Residual Plot") +
+  theme_classic() + 
+  coord_cartesian(ylim = c(-0.75, 0.75))
 ```
 
 ## Calculating impact on dependent variable through exponentiation of betas
