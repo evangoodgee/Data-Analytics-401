@@ -101,5 +101,54 @@ plot(fitted(lm4YearHumanitiesGrouped), res)
 ## Creating Paper Ready Visuals
 
 ```{r}
+# Model summary table
+rsq = summary(lm4YearHumanities)$r.squared
+adj_rsq = summary(lm4YearHumanities)$adj.r.squared
+tbl = tbl_regression(lm4YearHumanities, intercept = TRUE) %>%
+  modify_footnote(
+    update = everything() ~paste0("R-squared = ", round(rsq, 3),
+                                  ", Adj. R-squared = ", round(adj_rsq, 3))
+  )
 
+tbl %>% as_gt() %>% gt::gtsave("regression_table.html")
+tbl
+browseURL("regression_table.html")
+summary(lm4YearHumanities)
+
+# Normality of Residuals
+res = resid(lm4YearHumanities)
+qplot(sample = res) +
+  stat_qq() +
+  stat_qq_line() + 
+  theme_classic() +
+  labs(x = "Theoretical Quantiles", y ="Sample Quantiles", title = "Normal Q-Q Plot")
+  
+# Multicolinearity
+vif(lm4YearHumanities)
+
+# Homoscedasticity
+ggplot(data.frame(res = res), aes(x = fitted(lm4YearHumanities), y = res)) +
+  geom_point() +
+  geom_smooth() +
+  labs(x = "Fitted Values", y = "Residuals", title = "Residual Plot") +
+  theme_classic() + 
+  coord_cartesian(ylim = c(-0.75, 0.75))
+```
+
+## Exponentiating the coefficients to put in percentage terms
+
+```{r}
+exp(0.022173)
+exp(0.038081)
+exp(0.045948)
+exp(0.041916)
+exp(0.009524)
+exp(0.030669)
+exp(0.020893)
+exp(-0.064066)
+exp(-0.063737)
+exp(0.051402)
+exp(0.217936)
+exp(0.002444)
+exp(0.215921)
 ```
