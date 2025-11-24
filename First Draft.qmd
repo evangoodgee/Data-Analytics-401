@@ -11,6 +11,7 @@ library(readr)
 library(dplyr)
 library(ggplot2)
 library(gtsummary)
+library(car)
 
 EducationData = read_csv("Data/MergedEducationData.csv")
 EducationData$PELL_RT = as.numeric(EducationData$PELL_RT)
@@ -38,7 +39,7 @@ lm4YearMath = lm(log(EARN_MDN_4YR) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + A
 lm4YearBio = lm(log(EARN_MDN_4YR) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + AdmissionPct + ACTCM75 + log(AVGFACSAL), data = bio)
 
 # Regression for english majors
-lm4YearHumanities = lm(log(EARN_MDN_4YR) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + Public + AdmissionPct + GradRate + PELL_RT + log(AVGFACSAL), data = humanities)
+lm4YearHumanities = lm(log(EARN_MDN_4YR) ~ RUVH + RUH + RU + LMP + MMP + SMP + BCG + Public + AdmissionPct + GradRate + PELL_RT + ACTCM75 + log(AVGFACSAL), data = humanities)
 
 summary(lm4YearBio)
 summary(lm4YearMath)
@@ -67,6 +68,8 @@ hist(res)
 regVar = humanities %>% select(EARN_MDN_4YR,RUVH, RUH, RU, LMP, MMP, SMP, BCG, BCAS,  AdmissionPct, ACTCM75, AVGFACSAL)
 cor(regVar, use = "pairwise.complete.obs")
 
+vif(lm4YearHumanities)
+
 # Homoscedasticity
 plot(fitted(lm4YearHumanities), res)
 ```
@@ -75,7 +78,7 @@ plot(fitted(lm4YearHumanities), res)
 
 ```{r}
 lm4YearHumanitiesGrouped = lm(log(EARN_MDN_4YR) ~ Doctoral + Masters + Public + AdmissionPct + GradRate + PELL_RT + log(AVGFACSAL), data = humanities)
-summary(lm4YearEngGrouped)
+summary(lm4YearHumanitiesGrouped)
 ```
 
 ## Testing Model Validity
@@ -89,6 +92,14 @@ qqnorm(res)
 regVar = humanities %>% select(EARN_MDN_4YR, Masters, Doctoral, Baccelaureate, AdmissionPct, ACTCM75, AVGFACSAL)
 cor(regVar, use = "pairwise.complete.obs")
 
+vif(lm4YearHumanitiesGrouped)
+
 # Homoscedasticity
 plot(fitted(lm4YearHumanitiesGrouped), res)
+```
+
+## Creating Paper Ready Visuals
+
+```{r}
+
 ```
